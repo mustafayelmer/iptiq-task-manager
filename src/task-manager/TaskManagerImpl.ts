@@ -1,10 +1,11 @@
-import {TaskAddDto} from "./TaskAddDto";
-import {TaskItem} from "./TaskItem";
 import {TaskMode} from "./TaskMode";
 import {TaskPriority} from "./TaskPriority";
-import {taskManager} from "./errors";
+import {TaskAdapter, TaskAddDto, TaskItem, TaskManager} from "./interfaces";
+import {TaskModeDefault} from "./modes/TaskModeDefault";
+import {TaskModeFifo} from "./modes/TaskModeFifo";
+import {TaskModePriority} from "./modes/TaskModePriority";
+import {AlreadyInitializedError, InvalidCapacityError, InvalidModeError} from "./errors";
 
-export type TaskAddLambda = (dto?: TaskAddDto) => TaskItem;
 // noinspection JSUnusedGlobalSymbols
 /**
  * Task Manager
@@ -12,21 +13,29 @@ export type TaskAddLambda = (dto?: TaskAddDto) => TaskItem;
  * @class TaskManager
  * @abstract
  * */
-export abstract class TaskManager {
+export class TaskManagerImpl implements TaskManager {
     private _mode: TaskMode;
     private _capacity: number;
     private _items: Array<TaskItem>;
     private _initialized: boolean;
+    private _adapter: TaskAdapter;
+    private _adapters: Map<TaskMode, TaskAdapter>;
 
     constructor() {
+        this._adapters = new Map<TaskMode, TaskAdapter>();
+        this._adapters.set(TaskMode.DEFAULT, new TaskModeDefault());
+        this._adapters.set(TaskMode.FIFO, new TaskModeFifo());
+        this._adapters.set(TaskMode.PRIORITY, new TaskModePriority());
+
         this._capacity = 1000;
         this._mode = TaskMode.DEFAULT;
+        this._adapter = this._adapters.get(this._mode);
         this._items = [];
         this._initialized = false;
     }
     public initialize(capacity?: number, mode?: TaskMode): void {
         if (this._initialized) {
-            throw new taskManager.AlreadyInitializedError();
+            throw new AlreadyInitializedError();
         }
         if (capacity !== undefined) {
             this._setCapacity(capacity);
@@ -42,17 +51,21 @@ export abstract class TaskManager {
         } else if (Number.isInteger(capacity) && capacity > 0) {
             this._capacity = capacity;
         } else {
-            throw new taskManager.InvalidCapacityError(capacity);
+            throw new InvalidCapacityError(capacity);
         }
     }
     private _setMode(mode: TaskMode): void {
+        if (this._mode === mode) {
+            return;
+        }
         if (mode === undefined) {
             this._mode = TaskMode.DEFAULT;
         } else if (typeof mode === 'string' && Object.keys(TaskMode).includes(mode)) {
             this._mode = mode as TaskMode;
         } else {
-            throw new taskManager.InvalidModeError(mode);
+            throw new InvalidModeError(mode);
         }
+        this._adapter = this._adapters.get(this._mode);
     }
     get mode(): TaskMode {
         return this._mode;
@@ -69,7 +82,9 @@ export abstract class TaskManager {
     }
     // setter functions are banned
 
-    abstract add(dto?: TaskAddDto): TaskItem;
+    add(dto?: TaskAddDto): TaskItem {
+        return this._adapter.add(this, dto);
+    }
 
     list(): Array<TaskItem> {
         const cloned = [...this._items];
