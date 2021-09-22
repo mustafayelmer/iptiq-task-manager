@@ -33,3 +33,8 @@ export class InvalidPriorityError extends Error {
         super(`Task priority must be in [${Object.keys(TaskPriority).join(', ')}], but value is ${_visibleTextValue(value)}`);
     }
 }
+export class MaximumCapacityError extends Error {
+    constructor(capacity: number) {
+        super(`Task size reached at maximum capacity, size is ${_visibleTextValue(capacity)}`);
+    }
+}

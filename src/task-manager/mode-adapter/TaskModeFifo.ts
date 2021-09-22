@@ -1,9 +1,13 @@
 import {TaskAdapter, TaskAddDto, TaskItem, TaskManager} from "../interfaces";
 import {TaskItemImpl} from "../TaskItemImpl";
+import {MaximumCapacityError} from "../errors";
 
-export class TaskModePriority implements TaskAdapter {
+export class TaskModeFifo implements TaskAdapter {
 
     add(manager: TaskManager, dto: TaskAddDto): TaskItem {
+        while (manager.size >= manager.capacity) {
+            manager.items.shift();
+        }
         const item = new TaskItemImpl(manager, dto?.priority);
         manager.items.push(item);
         return item;

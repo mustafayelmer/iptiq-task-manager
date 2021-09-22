@@ -1,9 +1,9 @@
 import {TaskMode} from "./TaskMode";
 import {TaskPriority} from "./TaskPriority";
 import {TaskAdapter, TaskAddDto, TaskItem, TaskManager} from "./interfaces";
-import {TaskModeDefault} from "./modes/TaskModeDefault";
-import {TaskModeFifo} from "./modes/TaskModeFifo";
-import {TaskModePriority} from "./modes/TaskModePriority";
+import {TaskModeDefault} from "./mode-adapter/TaskModeDefault";
+import {TaskModeFifo} from "./mode-adapter/TaskModeFifo";
+import {TaskModePriority} from "./mode-adapter/TaskModePriority";
 import {AlreadyInitializedError, InvalidCapacityError, InvalidModeError} from "./errors";
 
 // noinspection JSUnusedGlobalSymbols

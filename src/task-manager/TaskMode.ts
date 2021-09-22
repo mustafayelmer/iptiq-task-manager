@@ -1,5 +1,5 @@
 export enum TaskMode {
-    DEFAULT = 'DEFAULT',
-    FIFO = 'FIFO',
-    PRIORITY = 'PRIORITY',
+    DEFAULT = 'default',
+    FIFO = 'fifo',
+    PRIORITY = 'priority',
 }
