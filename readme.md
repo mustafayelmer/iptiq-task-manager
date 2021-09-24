@@ -54,40 +54,6 @@ const {taskManager} = require('@yelmer-samples/iptiq-task-manager');
 taskManager.initialize(1000, 'default');
 ````
 
-### Reset Mode
-> Reset mode in runtime
->
-> **Note** - Clears all tasks (or kill)
->
-````javascript
-/**
-* 
-* @param {('default'|'fifo'|'priority')} mode
-* 
-* @returns {number} - killed task count
-* 
-* @throws {InvalidModeError} - if mode is not any of [default, fifo, priority]
-*/
-const killedCount = taskManager.resetMode('default');
-````
-### Reset Capacity
-> Reset capacity in runtime
->
-> **Note** - Clears all tasks (or kill)
->
-
-````javascript
-/**
-* @param {number} capacity
-* 
-* @returns {number} - killed task count
-* 
-* @throws {InvalidCapacityError} - if capacity is not valid positive integer
-*/
-const killedCount = taskManager.resetCapacity(1000);
-````
-
-
 ### Add
 > Creates a new task with given priority
 >
@@ -208,7 +174,42 @@ const isOverloaded = taskManager.isOverloaded;
 ````
 
 ---
-### Prepare by
+
+### Reset Mode
+> Reset mode in runtime
+>
+> **Note** - Clears all tasks (or kill)
+>
+````javascript
+/**
+* 
+* @param {('default'|'fifo'|'priority')} mode
+* 
+* @returns {number} - killed task count
+* 
+* @throws {InvalidModeError} - if mode is not any of [default, fifo, priority]
+*/
+const killedCount = taskManager.resetMode('default');
+````
+
+### Reset Capacity
+> Reset capacity in runtime
+>
+> **Note** - Clears all tasks (or kill)
+>
+
+````javascript
+/**
+* @param {number} capacity
+* 
+* @returns {number} - killed task count
+* 
+* @throws {InvalidCapacityError} - if capacity is not valid positive integer
+*/
+const killedCount = taskManager.resetCapacity(1000);
+````
+
+### Prepared by
 - Mustafa Yelmer
-- mustafayelmer(at)gmail.com
+- mustafa.yelmer(at)gmail.com
 - `2021-09-21`
