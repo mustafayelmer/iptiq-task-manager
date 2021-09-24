@@ -54,7 +54,7 @@ const {taskManager} = require('@yelmer-samples/iptiq-task-manager');
 taskManager.initialize(1000, 'default');
 ````
 
-### Reset
+### Reset Mode
 > Reset mode in runtime
 >
 > **Note** - Clears all tasks (or kill)
@@ -64,14 +64,14 @@ taskManager.initialize(1000, 'default');
 * 
 * @param {('default'|'fifo'|'priority')} mode
 * 
-* @returns {void}
+* @returns {number} - killed task count
 * 
 * @throws {InvalidModeError} - if mode is not any of [default, fifo, priority]
 */
-taskManager.resetMode('default');
+const killedCount = taskManager.resetMode('default');
 ````
 ### Reset Capacity
-> Initializes the task manager with core attributes
+> Reset capacity in runtime
 >
 > **Note** - Clears all tasks (or kill)
 >
@@ -80,11 +80,11 @@ taskManager.resetMode('default');
 /**
 * @param {number} capacity
 * 
-* @returns {void}
+* @returns {number} - killed task count
 * 
 * @throws {InvalidCapacityError} - if capacity is not valid positive integer
 */
-taskManager.resetCapacity(1000);
+const killedCount = taskManager.resetCapacity(1000);
 ````
 
 
