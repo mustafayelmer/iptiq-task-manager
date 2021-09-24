@@ -211,5 +211,5 @@ const killedCount = taskManager.resetCapacity(1000);
 
 ### Prepared by
 - Mustafa Yelmer
-- mustafayelmer(at)gmail.com
+- mustafa.yelmer(at)gmail.com
 - `2021-09-21`
