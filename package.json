@@ -1,8 +1,11 @@
 {
   "name": "@yelmer-samples/iptiq-task-manager",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "iptiQ Task Manager",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "files": [
+    "dist/*"
+  ],
   "scripts": {
     "clear": "rimraf dist",
     "lint": "eslint src/**/*.ts",

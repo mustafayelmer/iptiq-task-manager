@@ -1,6 +1,5 @@
 import {TaskAdapter, TaskAddDto, TaskItem, TaskManager} from "../interfaces";
 import {TaskItemImpl} from "../TaskItemImpl";
-import {MaximumCapacityError} from "../errors";
 
 export class TaskModeFifo implements TaskAdapter {
 
