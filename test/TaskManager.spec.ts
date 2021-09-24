@@ -36,7 +36,7 @@ describe('initialize', () => {
     });
     it('setting capacity should not raise an error', () => {
         assert.doesNotThrow(() => {
-            taskManager.resetCapacity(5);
+            taskManager.resetCapacity(TASK_SIZE);
         });
     });
     it('capacity should be set', () => {
@@ -76,13 +76,18 @@ describe('mode: shared', () => {
 });
 
 describe('mode: default', () => {
-    it(`clear tasks`, () => {
-        assert.doesNotThrow(() => {
-            taskManager.killAll();
+    describe('on-begin', () => {
+        it(`clear tasks should not raise en error`, () => {
+            assert.doesNotThrow(() => {
+                taskManager.killAll();
+            });
+        });
+        it(`task size should be zero`, () => {
+            assert.strictEqual(taskManager.size, 0);
         });
     });
-    describe('add', () => {
-        for (let i = 1; i <= 5; i++) {
+    describe('add()', () => {
+        for (let i = 1; i <= TASK_SIZE; i++) {
             const priority = randomPriority();
             it(`task ${i} > ${priority}`, () => {
                 assert.doesNotThrow(() => {
@@ -91,7 +96,10 @@ describe('mode: default', () => {
             });
         }
     });
-    describe('mode: default - overload', () => {
+    describe('on-end', () => {
+        it(`task size should be ${TASK_SIZE}`, () => {
+            assert.strictEqual(taskManager.size, TASK_SIZE);
+        });
         it(`created at should be incrementing, and id should be unique`, () => {
             // to check duplicated id
             const ids: Array<string> = [];
@@ -101,12 +109,10 @@ describe('mode: default', () => {
             let duplicatedIdError = false;
             for (const item of taskManager.items) {
                 if (ids.includes(item.pid)) {
-                    console.log('pid', {item: item.toPrint(), ids});
                     duplicatedIdError = true;
                 }
                 ids.push(item.pid);
                 if (lastCreatedAt >= item.createdAt) {
-                    console.log('createdAt', {item: item.toPrint(), lastCreatedAt});
                     createdAtError = true
                 }
                 lastCreatedAt = item.createdAt;
@@ -123,76 +129,216 @@ describe('mode: default', () => {
             });
         });
     });
-
-});
-
-describe('reset Mode: default > fifo', () => {
-    it('setting mode should not raise an error', () => {
-        assert.doesNotThrow(() => {
-            taskManager.resetMode(TaskMode.FIFO);
-        });
-    });
-    it(`mode should be fifo`, () => {
-        assert.strictEqual(taskManager.mode, TaskMode.FIFO);
-    });
-    it('task size should be zero (task array is empty)', () => {
-        assert.strictEqual(taskManager.size, 0);
-    });
 });
 
 describe('mode: fifo', () => {
-    for (let i = 1; i <= 5; i++) {
-        const priority = randomPriority();
-        it(`add-${i} > ${priority}`, () => {
+    describe('on-begin', () => {
+        it('setting mode should not raise an error', () => {
             assert.doesNotThrow(() => {
-                taskManager.add({priority: priority});
+                taskManager.resetMode(TaskMode.FIFO);
             });
-            assert.strictEqual(taskManager.size, i);
-            assert.strictEqual(taskManager.items[i - 1].priority, priority);
         });
-    }
-});
-describe('mode: fifo - overload', () => {
-    it(`isOverloaded should be return true`, () => {
-        assert.strictEqual(taskManager.isOverloaded, true);
-    });
-    const firstTask = {...taskManager.items[0]};
-    it(`if isOverloaded then add new task should not raise an error`, () => {
-        assert.doesNotThrow(() => {
-            taskManager.add({priority: TaskPriority.MEDIUM});
+        it(`mode should be fifo`, () => {
+            assert.strictEqual(taskManager.mode, TaskMode.FIFO);
+        });
+        it('task size should be zero (task array is empty)', () => {
+            assert.strictEqual(taskManager.size, 0);
         });
     });
-    it(`first item should be removed`, () => {
-        assert.notStrictEqual(taskManager.items[0].pid, firstTask.pid);
+    describe('add()', () => {
+        for (let i = 1; i <= TASK_SIZE; i++) {
+            const priority = randomPriority();
+            it(`task ${i} > ${priority}`, () => {
+                assert.doesNotThrow(() => {
+                    taskManager.add({priority: priority});
+                });
+            });
+        }
     });
-    it(`size should be same`, () => {
-        assert.strictEqual(taskManager.size, 5);
+    describe('on-end', () => {
+        it(`task size should be ${TASK_SIZE}`, () => {
+            assert.strictEqual(taskManager.size, TASK_SIZE);
+        });
+        it(`isOverloaded should be return true`, () => {
+            assert.strictEqual(taskManager.isOverloaded, true);
+        });
+        let firstPid: string = null;
+        it(`if isOverloaded then add new task should not raise an error`, () => {
+            firstPid = taskManager.items[0].pid;
+            assert.doesNotThrow(() => {
+                taskManager.add({priority: TaskPriority.MEDIUM});
+            });
+        });
+        it(`first item should be removed`, () => {
+            assert.notStrictEqual(taskManager.items[0].pid, firstPid);
+        });
+        it(`size should be same`, () => {
+            assert.strictEqual(taskManager.size, TASK_SIZE);
+        });
     });
 });
 
-describe('reset Mode: fifo > priority', () => {
-    it('setting mode should not raise an error', () => {
-        assert.doesNotThrow(() => {
-            taskManager.resetMode(TaskMode.PRIORITY);
+describe('mode: priority (skip case)', () => {
+    describe('on-begin', () => {
+        it('setting mode should not raise an error', () => {
+            assert.doesNotThrow(() => {
+                taskManager.resetMode(TaskMode.PRIORITY);
+            });
+        });
+        it(`mode should be fifo`, () => {
+            assert.strictEqual(taskManager.mode, TaskMode.PRIORITY);
+        });
+        it('task size should be zero (task array is empty)', () => {
+            assert.strictEqual(taskManager.size, 0);
         });
     });
-    it(`mode should be priority`, () => {
-        assert.strictEqual(taskManager.mode, TaskMode.PRIORITY);
+    describe('add()', () => {
+        for (let i = 1; i <= TASK_SIZE; i++) {
+            const priority = TaskPriority.HIGH;
+            it(`task ${i} > ${priority}`, () => {
+                assert.doesNotThrow(() => {
+                    taskManager.add({priority: priority});
+                });
+            });
+        }
     });
-    it('task size should be zero (task array is empty)', () => {
-        assert.strictEqual(taskManager.size, 0);
+    describe('on-end', () => {
+        it(`task size should be ${TASK_SIZE}`, () => {
+            assert.strictEqual(taskManager.size, TASK_SIZE);
+        });
+        it(`isOverloaded should be return true`, () => {
+            assert.strictEqual(taskManager.isOverloaded, true);
+        });
+
+        it(`add operation should be skipped`, () => {
+            assert.strictEqual(taskManager.add({priority: TaskPriority.HIGH}), null);
+        });
+        it(`size should be same`, () => {
+            assert.strictEqual(taskManager.size, TASK_SIZE);
+        });
+    });
+});
+describe('mode: priority (override case)', () => {
+    describe('on-begin', () => {
+        it(`clear tasks should not raise en error`, () => {
+            assert.doesNotThrow(() => {
+                taskManager.killAll();
+            });
+        });
+        it(`task size should be zero`, () => {
+            assert.strictEqual(taskManager.size, 0);
+        });
+    });
+    describe('add()', () => {
+        for (let i = 1; i <= TASK_SIZE; i++) {
+            const priority = TaskPriority.LOW;
+            it(`task ${i} > ${priority}`, () => {
+                assert.doesNotThrow(() => {
+                    taskManager.add({priority: priority});
+                });
+            });
+        }
+    });
+    describe('on-end', () => {
+        it(`task size should be ${TASK_SIZE}`, () => {
+            assert.strictEqual(taskManager.size, TASK_SIZE);
+        });
+        it(`isOverloaded should be return true`, () => {
+            assert.strictEqual(taskManager.isOverloaded, true);
+        });
+        let firstPid: string = null;
+        it(`if isOverloaded then add new task should not raise an error`, () => {
+            firstPid = taskManager.items[0].pid;
+            assert.doesNotThrow(() => {
+                taskManager.add({priority: TaskPriority.HIGH});
+            });
+        });
+        it(`first item (with low priority) should be removed`, () => {
+            assert.notStrictEqual(taskManager.items[0].pid, firstPid);
+        });
+        it(`size should be same`, () => {
+            assert.strictEqual(taskManager.size, TASK_SIZE);
+        });
     });
 });
 
-describe('mode: priority with ignoring case', () => {
-    for (let i = 1; i <= 5; i++) {
-        const priority = TaskPriority.HIGH;
-        it(`add-${i} > ${priority}`, () => {
+describe('kill & list', () => {
+    describe('killAll()', () => {
+        it(`clear tasks should not raise en error`, () => {
             assert.doesNotThrow(() => {
-                taskManager.add({priority: priority});
+                taskManager.killAll();
             });
-            assert.strictEqual(taskManager.size, i);
-            assert.strictEqual(taskManager.items[i - 1].priority, priority);
         });
-    }
+        it(`set Capacity, doubling size to test kill by priority`, () => {
+            assert.doesNotThrow(() => {
+                taskManager.resetCapacity(TASK_SIZE * 2);
+            });
+        });
+    });
+    describe('add()', () => {
+        for (let i = 1; i <= TASK_SIZE; i++) {
+            const priority = TaskPriority.LOW;
+            it(`task ${i} > ${priority}`, () => {
+                assert.doesNotThrow(() => {
+                    taskManager.add({priority: priority});
+                });
+            });
+        }
+        for (let i = 1; i <= TASK_SIZE; i++) {
+            const priority = TaskPriority.MEDIUM;
+            it(`task ${i} > ${priority}`, () => {
+                assert.doesNotThrow(() => {
+                    taskManager.add({priority: priority});
+                });
+            });
+        }
+    });
+    describe('list()', () => {
+        let items: Array<TaskItem> = [];
+        it(`list should not raise an error`, () => {
+            assert.doesNotThrow(() => {
+                items = taskManager.list();
+            });
+        });
+        it(`tasks should be create time ordered`, () => {
+            let prevCreatedAt: number = 0;
+            let createdAtError = false;
+            for (const item of taskManager.items) {
+                if (prevCreatedAt >= item.createdAt) {
+                    createdAtError = true
+                }
+                prevCreatedAt = item.createdAt;
+            }
+            assert.strictEqual(createdAtError, false);
+        });
+    });
+    describe('killGroup()', () => {
+        let deletedCount = 0;
+        it(`clear by priority should not raise en error`, () => {
+            assert.doesNotThrow(() => {
+                deletedCount = taskManager.killGroup(TaskPriority.LOW);
+            });
+        });
+        // because half of task is low, others medium
+        it(`deleted tasks should be ${TASK_SIZE}`, () => {
+            assert.strictEqual(taskManager.size, TASK_SIZE);
+        });
+        it(`remained tasks should be ${TASK_SIZE}`, () => {
+            assert.strictEqual(taskManager.size, TASK_SIZE);
+        });
+    });
+
+    describe('kill()', () => {
+        let firstPid: string = null;
+        it(`selected task should be killed`, () => {
+            firstPid = taskManager.items[0].pid;
+            assert.strictEqual(taskManager.kill(firstPid), true);
+        });
+        it(`deleted task should not exist`, () => {
+            assert.notStrictEqual(taskManager.items[0].pid, firstPid);
+        });
+        it(`remained tasks should be ${TASK_SIZE - 1}`, () => {
+            assert.strictEqual(taskManager.size, TASK_SIZE - 1);
+        });
+    });
 });

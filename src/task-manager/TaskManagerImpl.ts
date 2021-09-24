@@ -38,6 +38,9 @@ export class TaskManagerImpl implements TaskManager {
         this._items = [];
         this._initialized = false;
     }
+    /**
+     * @inherited
+     * */
     public initialize(capacity?: number, mode?: TaskMode): void {
         if (this._initialized) {
             throw new AlreadyInitializedError();
@@ -130,5 +133,14 @@ export class TaskManagerImpl implements TaskManager {
 
     get isOverloaded(): boolean {
         return (this.items.length >= this._capacity);
+    }
+
+    toPrint(): TaskManager {
+        return {
+            mode: this._mode,
+            capacity: this._capacity,
+            items: this._items.map(item => item.toPrint()),
+            size: this.size,
+        } as TaskManager;
     }
 }

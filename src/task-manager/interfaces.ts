@@ -21,6 +21,7 @@ export interface TaskManager {
     resetCapacity(capacity: number): number;
     // for only testing
     generateTimestamp(): number;
+    toPrint(): TaskManager;
 }
 export interface TaskItem {
     createdAt: number;
