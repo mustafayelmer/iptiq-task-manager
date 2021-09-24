@@ -1,6 +1,6 @@
 {
   "name": "@yelmer-samples/iptiq-task-manager",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "iptiQ Task Manager",
   "main": "index.js",
   "scripts": {
@@ -36,7 +36,6 @@
     "typescript": "^4.1.4"
   },
   "dependencies": {
-    "dotenv": "^10.0.0",
     "uuid": "^8.3.2"
   }
 }

@@ -26,14 +26,8 @@ export class TaskManagerImpl implements TaskManager {
         this._adapters.set(TaskMode.DEFAULT, new TaskModeDefault());
         this._adapters.set(TaskMode.FIFO, new TaskModeFifo());
         this._adapters.set(TaskMode.PRIORITY, new TaskModePriority());
-        try {
-            this._capacity = parseInt(process.env.TM_CAPACITY as string, 10);
-        } catch (e) {
-        }
-        if (!Number.isInteger(this._capacity) || this._capacity < 1) {
-            this._capacity = 1000;
-        }
-        this._mode = checkTaskMode(process.env.TM_MODE as TaskMode, TaskMode.DEFAULT);
+        this._capacity = 1000;
+        this._mode = TaskMode.DEFAULT;
         this._adapter = this._adapters.get(this._mode);
         this._items = [];
         this._initialized = false;

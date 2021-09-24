@@ -25,11 +25,11 @@ function randomPriority(): TaskPriority {
 // endregion test-specific
 
 describe('initialize', () => {
-    it(`capacity should be default: ${process.env.TM_CAPACITY}`, () => {
-        assert.strictEqual(taskManager.capacity, parseInt(process.env.TM_CAPACITY));
+    it(`capacity should be default: ${1000}`, () => {
+        assert.strictEqual(taskManager.capacity, 1000);
     });
-    it(`mode should be default: ${process.env.TM_MODE}`, () => {
-        assert.strictEqual(taskManager.mode, process.env.TM_MODE);
+    it(`mode should be default: ${TaskMode.DEFAULT}`, () => {
+        assert.strictEqual(taskManager.mode, TaskMode.DEFAULT);
     });
     it('task size should be zero (task array is empty)', () => {
         assert.strictEqual(taskManager.size, 0);
