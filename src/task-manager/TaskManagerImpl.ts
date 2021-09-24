@@ -48,9 +48,25 @@ export class TaskManagerImpl implements TaskManager {
         this._initialized = true;
     }
     private _setCapacity(capacity: number): void {
-        if (capacity === undefined) {
-            this._capacity = 1000;
-        } else if (Number.isInteger(capacity) && capacity > 0) {
+        let num: number = null;
+        switch (typeof capacity) {
+            case "undefined":
+                this._capacity = 1000;
+                break;
+            case "string":
+                try {
+                    num = parseInt(capacity, 10);
+                } catch (e) {
+                    throw new InvalidCapacityError(capacity);
+                }
+                break;
+            case "number":
+                num = Math.floor(capacity);
+                break;
+            default:
+                throw new InvalidCapacityError(capacity);
+        }
+        if (Number.isInteger(capacity) && capacity > 0) {
             this._capacity = capacity;
         } else {
             throw new InvalidCapacityError(capacity);

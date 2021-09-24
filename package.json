@@ -1,6 +1,6 @@
 {
   "name": "@yelmer-samples/iptiq-task-manager",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "iptiQ Task Manager",
   "main": "dist/index.js",
   "files": [
