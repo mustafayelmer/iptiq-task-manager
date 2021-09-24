@@ -66,10 +66,10 @@ export class TaskManagerImpl implements TaskManager {
             default:
                 throw new InvalidCapacityError(capacity);
         }
-        if (Number.isInteger(capacity) && capacity > 0) {
-            this._capacity = capacity;
+        if (Number.isInteger(num) && num > 0) {
+            this._capacity = num;
         } else {
-            throw new InvalidCapacityError(capacity);
+            throw new InvalidCapacityError(num);
         }
     }
     private _setMode(mode: TaskMode): void {
