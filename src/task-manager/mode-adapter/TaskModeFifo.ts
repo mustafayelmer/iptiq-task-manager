@@ -5,7 +5,7 @@ import {MaximumCapacityError} from "../errors";
 export class TaskModeFifo implements TaskAdapter {
 
     add(manager: TaskManager, dto: TaskAddDto): TaskItem {
-        while (manager.size >= manager.capacity) {
+        while (manager.isOverloaded) {
             manager.items.shift();
         }
         const item = new TaskItemImpl(manager, dto?.priority);

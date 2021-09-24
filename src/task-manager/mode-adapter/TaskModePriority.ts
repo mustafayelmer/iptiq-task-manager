@@ -6,7 +6,7 @@ import {InvalidModeError} from "../errors";
 export class TaskModePriority implements TaskAdapter {
 
     add(manager: TaskManager, dto: TaskAddDto): TaskItem {
-        while (manager.size >= manager.capacity) {
+        while (manager.isOverloaded) {
             switch (dto?.priority) {
                 case TaskPriority.LOW:
                     return null;

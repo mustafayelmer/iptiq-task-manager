@@ -1,6 +1,5 @@
 import {TaskItem, TaskManager} from "./interfaces";
-import {TaskPriority} from "./TaskPriority";
-import {InvalidModeError} from "./errors";
+import {checkTaskPriority, TaskPriority} from "./TaskPriority";
 import * as uuid from 'uuid';
 
 export class TaskItemImpl implements TaskItem {
@@ -22,18 +21,27 @@ export class TaskItemImpl implements TaskItem {
     }
 
     constructor(manager: TaskManager, priority: TaskPriority) {
-        if (priority === undefined) {
-            this._priority = TaskPriority.LOW;
-        } else if (typeof priority === 'string' && Object.keys(TaskPriority).includes(priority)) {
-            this._priority = priority as TaskPriority;
-        } else {
-            throw new InvalidModeError(priority);
-        }
-        this._createdAt = new Date().getTime();
+        this._priority = checkTaskPriority(priority, TaskPriority.LOW, true);
+        this._createdAt = manager.generateTimestamp();
         this._pid = uuid.v4();
         this._manager = manager;
     }
     kill(): void {
         this._manager.kill(this._pid);
+    }
+
+    /**
+     * To ignore manager attribute, json stringify method is overridden
+     * @override
+     * */
+    toJSON(): TaskItem {
+        return this.toPrint();
+    }
+    toPrint(): TaskItem {
+        return {
+            createdAt: this._createdAt,
+            pid: this._pid,
+            priority: this._priority,
+        } as TaskItem;
     }
 }

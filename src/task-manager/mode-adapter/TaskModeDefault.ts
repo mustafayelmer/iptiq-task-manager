@@ -5,7 +5,7 @@ import {MaximumCapacityError} from "../errors";
 export class TaskModeDefault implements TaskAdapter {
 
     add(manager: TaskManager, dto: TaskAddDto): TaskItem {
-        if (manager.size >= manager.capacity) {
+        if (manager.isOverloaded) {
             throw new MaximumCapacityError(manager.capacity);
         }
         const item = new TaskItemImpl(manager, dto?.priority);

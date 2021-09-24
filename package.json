@@ -1,12 +1,13 @@
 {
   "name": "@yelmer-samples/iptiq-task-manager",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "iptiQ Task Manager",
   "main": "index.js",
   "scripts": {
     "clear": "rimraf dist",
     "lint": "eslint src/**/*.ts",
     "build": "npm run clear && tsc",
+    "test": "mocha -r ts-node/register test/**/*.spec.ts",
     "run-js": "node dist/index.js",
     "run-ts": "node -r ts-node/register src/index.ts",
     "start": "npm run build && npm run run-js",
@@ -35,6 +36,7 @@
     "typescript": "^4.1.4"
   },
   "dependencies": {
+    "dotenv": "^10.0.0",
     "uuid": "^8.3.2"
   }
 }

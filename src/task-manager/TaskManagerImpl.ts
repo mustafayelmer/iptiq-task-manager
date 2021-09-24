@@ -1,10 +1,10 @@
-import {TaskMode} from "./TaskMode";
+import {checkTaskMode, TaskMode} from "./TaskMode";
 import {TaskPriority} from "./TaskPriority";
 import {TaskAdapter, TaskAddDto, TaskItem, TaskManager} from "./interfaces";
 import {TaskModeDefault} from "./mode-adapter/TaskModeDefault";
 import {TaskModeFifo} from "./mode-adapter/TaskModeFifo";
 import {TaskModePriority} from "./mode-adapter/TaskModePriority";
-import {AlreadyInitializedError, InvalidCapacityError, InvalidModeError} from "./errors";
+import {AlreadyInitializedError, InvalidCapacityError} from "./errors";
 
 // noinspection JSUnusedGlobalSymbols
 /**
@@ -26,9 +26,14 @@ export class TaskManagerImpl implements TaskManager {
         this._adapters.set(TaskMode.DEFAULT, new TaskModeDefault());
         this._adapters.set(TaskMode.FIFO, new TaskModeFifo());
         this._adapters.set(TaskMode.PRIORITY, new TaskModePriority());
-
-        this._capacity = 1000;
-        this._mode = TaskMode.DEFAULT;
+        try {
+            this._capacity = parseInt(process.env.TM_CAPACITY as string, 10);
+        } catch (e) {
+        }
+        if (!Number.isInteger(this._capacity) || this._capacity < 1) {
+            this._capacity = 1000;
+        }
+        this._mode = checkTaskMode(process.env.TM_MODE as TaskMode, TaskMode.DEFAULT);
         this._adapter = this._adapters.get(this._mode);
         this._items = [];
         this._initialized = false;
@@ -58,13 +63,7 @@ export class TaskManagerImpl implements TaskManager {
         if (this._mode === mode) {
             return;
         }
-        if (mode === undefined) {
-            this._mode = TaskMode.DEFAULT;
-        } else if (typeof mode === 'string' && Object.keys(TaskMode).includes(mode)) {
-            this._mode = mode as TaskMode;
-        } else {
-            throw new InvalidModeError(mode);
-        }
+        this._mode = checkTaskMode(mode, TaskMode.DEFAULT, true);
         this._adapter = this._adapters.get(this._mode);
     }
     get mode(): TaskMode {
@@ -123,5 +122,13 @@ export class TaskManagerImpl implements TaskManager {
     resetCapacity(capacity: number): number {
         this._setCapacity(capacity);
         return this.killAll();
+    }
+
+    generateTimestamp(): number {
+        return new Date().getTime();
+    }
+
+    get isOverloaded(): boolean {
+        return (this.items.length >= this._capacity);
     }
 }
